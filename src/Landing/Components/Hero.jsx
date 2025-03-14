@@ -32,7 +32,7 @@ export const Hero = () => {
                         href="#cartera"
                         className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-3 rounded-md inline-block"
                     >
-                        Ver cartelera
+                        Ver Cartelera
                     </a>
 
                 </div>

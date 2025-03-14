@@ -19,7 +19,7 @@ export const Header = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-6">
           <a href="#cartera" className="text-white hover:text-red-200 transition">
-            Cartera
+            Cartelera
           </a>
           <a href="#sobreNosotros" className="text-white hover:text-red-200 transition">
             Sobre nosotros
@@ -55,7 +55,7 @@ export const Header = () => {
             href="#cartera"
             className="block px-4 py-2 text-white hover:bg-red-600 transition"
           >
-            Cartera
+            Cartelera
           </a>
           <a
             href="#sobreNosotros"
@@ -71,7 +71,7 @@ export const Header = () => {
             Preguntas Comunes
           </a>
 
-          <Link to="/login" className="block w-full px-4 py-2 text-white hover:bg-red-700 transition">
+          <Link to="/login" className="block w-full px-4 py-2 text-white hover:bg-red-700 transition font-bold">
             Iniciar Sesión
           </Link>
 
