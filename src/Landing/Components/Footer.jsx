@@ -3,7 +3,7 @@
 export const Footer = () => {
     return (
 
-        <footer className="bg-gray-800 text-white py-8 sm:py-12">
+        <footer className="bg-terciary text-white py-8 sm:py-12">
             <div className="container mx-auto px-4 sm:px-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
                     <div>

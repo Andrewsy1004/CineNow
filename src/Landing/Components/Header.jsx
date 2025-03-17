@@ -11,7 +11,7 @@ export const Header = () => {
 
 
   return (
-    <header className="bg-[#E40808] shadow-md sticky top-0 z-50">
+    <header className="bg-primary-red shadow-md sticky top-0 z-50">
       <nav className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
 
         <div className="text-2xl font-bold text-white">CineNow</div>
@@ -30,7 +30,7 @@ export const Header = () => {
         </div>
 
         {/* Desktop Login Button */}
-        <Link to="/login" className="hidden md:flex text-red-500 bg-white py-2 px-4 rounded-lg hover:bg-gray-100 transition">
+        <Link to="/login" className="hidden md:flex text-primary-red bg-white py-2 px-4 rounded-lg hover:bg-gray-100 transition">
           Iniciar Sesión
         </Link>
 
@@ -50,7 +50,7 @@ export const Header = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-[#E40808] absolute top-12 right-0 w-full shadow-lg">
+        <div className="md:hidden bg-primary-red absolute top-12 right-0 w-full shadow-lg">
           <a
             href="#cartera"
             className="block px-4 py-2 text-white hover:bg-red-600 transition"

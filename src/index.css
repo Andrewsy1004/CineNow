@@ -11,6 +11,12 @@
   -ms-overflow-style: none; 
 }
 
+@theme {
+  --color-primary-red: #E40808;
+  --color-secondary-white: #F9FAFB;
+  --color-terciary: #1E2939;
+}
+
 
 .mySwiper .swiper-pagination {
   position: relative;
