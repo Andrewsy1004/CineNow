@@ -55,11 +55,10 @@ export const PopularMovies = () => {
             clickable: true,
             dynamicBullets: true,
           }}
-          navigation={true}
+          // navigation={true}
           modules={[EffectCoverflow, Pagination, Navigation]}
           className="mySwiper"
         >
-          {console.log(movies.error)}
           {!!movies.error && (
             <p className="text-center text-red-500 font-bold text-2xl">
               Error al obtener peliculas:{" "}

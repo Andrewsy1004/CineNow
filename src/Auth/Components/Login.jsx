@@ -5,12 +5,14 @@ import { Link } from "react-router-dom";
 import { Eye, EyeOff } from 'lucide-react'
 import toast from "react-hot-toast";
 
+import { IniciarSesion } from "../helpers";
+
 
 export const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    correo: '',
+    contrasena: ''
   })
 
 
@@ -24,25 +26,35 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const { email, password } = formData
+    const { correo, contrasena } = formData
 
-    if( email.trim() === '' || !email.includes('@') || password.trim() === '' ){
+    if (correo.trim() === '' || !correo.includes('@') || contrasena.trim() === '') {
       toast.error('Por favor ingresa un correo valido y una contraseña')
       return
     }
 
-    if (email.trim() === '' || !email.includes('@')) {
+    if (correo.trim() === '' || !correo.includes('@')) {
       toast.error('Por favor ingresa un correo valido')
       return
     }
 
-    if (password.trim() === '') {
+    if (contrasena.trim() === '') {
       toast.error('Por favor ingresa una contraseña')
       return
     }
-    
+
+    const response = await IniciarSesion(correo, contrasena)
+
+    const { status, message } = response
+
+    if (status) {
+      toast.success(message)
+    } else {
+      toast.error(message)
+    }
+
   }
-  
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -67,8 +79,8 @@ export const Login = () => {
               </p>
             </div>
           </div>
-          
-          
+
+
           <form className="space-y-6 mt-3" onSubmit={handleSubmit}>
             {/* Email */}
             <div>
@@ -78,10 +90,10 @@ export const Login = () => {
               <div className="mt-1">
                 <input
                   id="email"
-                  name="email"
+                  name="correo"
                   type="email"
                   autoComplete="email"
-                  value={formData.email}
+                  value={formData.correo}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
                    placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
@@ -97,10 +109,10 @@ export const Login = () => {
               <div className="mt-1 relative">
                 <input
                   id="password"
-                  name="password"
+                  name="contrasena"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  value={formData.password}
+                  value={formData.contrasena}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
                   focus:outline-none focus:ring-primary-red focus:border-primary-red sm:text-sm"
@@ -121,7 +133,7 @@ export const Login = () => {
               </div>
             </div>
 
-            
+
 
             <div>
               <button
@@ -135,7 +147,7 @@ export const Login = () => {
 
           </form>
 
-        
+
 
           <div className="mt-6">
             <div className="relative">

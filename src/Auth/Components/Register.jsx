@@ -4,14 +4,16 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { RegistrarUsuario } from "../helpers";
 
 
 export const Register = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    fullName: ''
+    correo: '',
+    contrasena: '',
+    nombre: '',
+    apellido: ''
   })
 
   const handleChange = (e) => {
@@ -25,16 +27,42 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const { email, password, fullName } = formData
+    const { correo, contrasena, nombre, apellido } = formData
+    
+    if( nombre.trim() === '' ) toast.error('Por favor ingresa tu nombre')
+    if( apellido.trim() === '' ) toast.error('Por favor ingresa tu apellido')
+         
+    if( correo.trim() === '' || !correo.includes('@') ){
+      toast.error('Por favor ingresa un correo valido, que sea un correo de gmail')
+      return
+    }
 
+    if (contrasena.trim() === '') {
+      toast.error('Por favor ingresa una contraseña')
+      return
+    }
+    
+    const regex = /(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
+
+    if (!regex.test(contrasena)) {
+      toast.error('La contraseña debe tener al menos una mayúscula, una minúscula y un número o carácter especial, sin puntos ni saltos de línea');
+      return false;
+    }
+   
+    const response = await RegistrarUsuario( nombre, apellido, correo, contrasena )
+
+    if( response.status ){
+      toast.success(response.message)
+    }else{
+      toast.error(response.message)
+    }
 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-4 sm:px-6 lg:px-8">
+      <div className=" sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-
           <div className="w-full max-w-md mx-auto ">
             <div className="flex justify-center">
               <img
@@ -54,18 +82,33 @@ export const Register = () => {
             </div>
           </div>
 
-          <form className="space-y-6 mt-3">
+          <form className="space-y-6 mt-3" onSubmit={handleSubmit}> 
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                Nombre completo
+              <label htmlFor="Nombre" className="block text-sm font-medium text-gray-700">
+                Nombre
               </label>
               <div className="mt-1">
                 <input
-                  id="fullName"
-                  name="fullName"
+                  id="Nombre"
+                  name="nombre"
                   type="text"
-                  required
-                  value={formData.fullName}
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="apellido" className="block text-sm font-medium text-gray-700">
+                Apellido
+              </label>
+              <div className="mt-1">
+                <input
+                  id="apellido"
+                  name="apellido"
+                  type="text"
+                  value={formData.apellido}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                 />
@@ -79,11 +122,10 @@ export const Register = () => {
               <div className="mt-1">
                 <input
                   id="email"
-                  name="email"
+                  name="correo"
                   type="email"
                   autoComplete="email"
-                  required
-                  value={formData.email}
+                  value={formData.correo}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                 />
@@ -91,17 +133,16 @@ export const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="Contraseña" className="block text-sm font-medium text-gray-700">
                 Contraseña
               </label>
               <div className="mt-1 relative">
                 <input
-                  id="password"
-                  name="password"
+                  id="Contraseña"
+                  name="contrasena"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  required
-                  value={formData.password}
+                  value={formData.contrasena}
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                 />
@@ -119,15 +160,7 @@ export const Register = () => {
               </div>
             </div>
 
-            {/* <div className="flex items-center justify-center">
-              <div className="text-sm">
 
-                <Link to="/CuentaVerificacion" className="font-medium text-blue-600 hover:text-blue-500">
-                  ¿Ya tienes una cuenta, pero no la verificaste?
-                </Link>
-
-              </div>
-            </div> */}
 
             <div>
               <button
