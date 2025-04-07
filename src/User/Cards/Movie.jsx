@@ -13,8 +13,6 @@ export const Movie = ({ displayedMovies }) => {
     setSelectedMovie(movie);
     setIsModalOpen(true);
   };
-
-  console.log({displayedMovies});
   
 
   const closeModal = () => {
