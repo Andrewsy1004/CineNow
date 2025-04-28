@@ -11,11 +11,11 @@ export const IniciarSesion = async (emailUser, contrasena) => {
    try {
       // const response = await axios.post(`${host}/auth/login`, { correo: emailUser, contrasena });
 
-      // const { id, correo, nombre, apellido, roles, token, FotoPerfil } = response.data;
+      // const { id, correo, nombre, apellido, roles, token, FotoPerfil, NumeroCuenta } = response.data;
 
-      // Login(id, correo, nombre, apellido, roles, token, FotoPerfil);
+      // Login(id, correo, nombre, apellido, roles, token, FotoPerfil, NumeroCuenta);
 
-      Login("1234", "andres.sy", "andres", "felipe", ["User"], "1234TOKEN", "HTTP:IMG"  )
+      Login("1234", "andres.sy", "andres", "felipe", ["Cajero"], "1234TOKEN", "HTTP:IMG", "123 456 789"  )
 
       return {
          status: true,

@@ -1,23 +1,69 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useMovieStore from "../../Store/movieStore";
-import { ModalMovie } from "../Modals";
+import { ModalFormUser, ModalMovie } from "../Modals";
 import { genreMap } from "../../Constants";
 
-export const Movie = ({ displayedMovies }) => {
+import toast from "react-hot-toast";
+
+import useAuthStore from "../../Store/authStore";
+
+export const Movie = ({ displayedMovies, Upcoming = false }) => {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { select } = useMovieStore();
+
+  const [modalInfoUser, setModalInfoUser] = useState(false);
+  const [infoBoleto, setInfoBoleto] = useState(false);
+
+  const roles = useAuthStore((state) => state.roles);
+
 
   const openModal = (movie) => {
     setSelectedMovie(movie);
     setIsModalOpen(true);
   };
-  
+
 
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+
+  const handleModalInfoUser = (movie) => {
+    setModalInfoUser(true);
+    setSelectedMovie(movie);
+  };
+
+
+  const handleMovieClick = (movie) => {
+
+    const objectmovie = {
+      id: movie.id,
+      title: movie.title,
+      poster_path: movie.poster_path,
+      backdrop_path: movie.backdrop_path,
+      overview: movie.overview,
+      vote_count: movie.vote_count,
+      genres: movie.genres,
+      amount_of_tickets: 1,
+    };
+
+
+    const stored = JSON.parse(localStorage.getItem("entradas")) || [];
+
+    const exists = stored.some((t) => t.id === objectmovie.id);
+
+    // console.log("Entradas en localStorage:", stored);
+
+    if (exists) {
+      toast.error("Ya tienes un boleto para esta película.");
+    } else {
+      stored.push(objectmovie);
+      localStorage.setItem("entradas", JSON.stringify(stored));
+      toast.success("Boleto agregado correctamente.");
+    }
+
+  }
 
   return (
     <div className="relative">
@@ -52,29 +98,44 @@ export const Movie = ({ displayedMovies }) => {
                 .filter(Boolean)
                 .join(", ")}
             </p>
-            <Link to={`/${movie.title}`}>
-              <button
-                onClick={() =>
-                  select(
-                    movie.id,
-                    movie.original_language,
-                    movie.original_title,
-                    movie.overview,
-                    movie.popularity,
-                    movie.genre_ids,
-                    movie.poster_path,
-                    movie.release_date,
-                    movie.title,
-                    movie.video,
-                    movie.vote_average,
-                    movie.vote_count
-                  )
-                }
-                className="bg-[#e7000b] text-white px-4 py-2 rounded hover:bg-[#c60009] transition duration-300"
-              >
-                Comprar Boleto
-              </button>
-            </Link>
+
+
+            {
+              (roles.includes("usuario") || roles.includes("VipUsuario")) && !Upcoming ? (
+                <button
+                  onClick={() => {
+                    select(movie);
+                    handleMovieClick(movie);
+                  }}
+                  className="bg-[#e7000b] text-white px-4 py-2 rounded hover:bg-[#c60009] transition duration-300"
+                >
+                  Agregar a mis entradas
+                </button>
+              ) : null
+            }
+
+            {
+              (roles.includes("Cajero")) && !Upcoming ? (
+                <button
+                  onClick={() => {
+                    handleModalInfoUser(movie);
+                  }}
+                  className="bg-[#e7000b] text-white px-4 py-2 rounded hover:bg-[#c60009] transition duration-300"
+                >
+                  Comprar Boletos
+                </button>
+              ) : null
+            }
+
+
+
+
+            {/* <button
+              className="bg-[#e7000b] text-white px-4 py-2 rounded hover:bg-[#c60009] transition duration-300"
+            >
+              Comprar Boleto
+            </button> */}
+
           </div>
         ))}
       </div>
@@ -85,8 +146,18 @@ export const Movie = ({ displayedMovies }) => {
           selectedMovie={selectedMovie}
           genreMap={genreMap}
           closeModal={closeModal}
+          Upcoming={Upcoming}
         />
       )}
+
+      {modalInfoUser && selectedMovie && (
+        <>
+          <ModalFormUser selectedMovie={selectedMovie} onClose={() => setModalInfoUser(false)}  />
+        </>
+      )}
+
+
+
     </div>
   );
 };

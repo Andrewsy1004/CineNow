@@ -16,6 +16,7 @@ export const ModalUser = ({ setShowProfileModal }) => {
   const correo = useAuthStore((state) => state.correo);
   const FotoPerfil = useAuthStore((state) => state.FotoPerfil);
   const token  = useAuthStore((state) => state.token);
+  const NumeroCuenta = useAuthStore((state) => state.NumeroCuenta);
 
 
   const [formData, setFormData] = useState({
@@ -23,6 +24,7 @@ export const ModalUser = ({ setShowProfileModal }) => {
     apellido: apellido || '',
     correo: correo || '',
     FotoPerfil: FotoPerfil || '',
+    NumeroCuenta: NumeroCuenta || ''
   });
 
 
@@ -145,6 +147,19 @@ export const ModalUser = ({ setShowProfileModal }) => {
               onChange={handleChange}
               className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1"
               placeholder="Ingresa tu correo"
+            />
+          </div>
+
+          <div>
+            <label htmlFor='NumeroCuenta' className="block text-sm font-medium text-gray-700">Número de cuenta</label>
+            <input
+              type="text"
+              id = 'NumeroCuenta'
+              name="NumeroCuenta"
+              value={formData.NumeroCuenta}
+              onChange={handleChange}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1"
+              placeholder="Ingresa tu número de cuenta"
             />
           </div>
 

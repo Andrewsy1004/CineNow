@@ -1,10 +1,14 @@
 
 import { useState } from 'react';
 
+import { Link, useNavigate } from 'react-router-dom';
+
 import { ModalUser } from '../Modals/ModalUser';
 import useAuthStore from '../../Store/authStore';
 
 export const Navbar = () => {
+    const navigate = useNavigate();
+
     const logout = useAuthStore.getState().Logout;
     const fullName = useAuthStore((state) => state.nombre);
     const roles = useAuthStore((state) => state.roles);
@@ -14,10 +18,10 @@ export const Navbar = () => {
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);
 
-    const userMenuItems = [
-        { label: "Mis entradas", href: "#tickets" },
-        { label: "Favoritos", href: "#favorites" },
-        { label: "Configuración", href: "#settings" },
+    const userMenuUsuario = [
+        { label: "Mis entradas", href: "/mis-entradas", roles: ["usuario", "VipUsuario"] },
+        { label: "Mis Tickets", href: "/tickets", roles: ["usuario", "VipUsuario"] },
+        { label: "Estadísticas", href: "/estadisticas", roles: ["usuario", "VipUsuario"] },
     ];
 
     const handleMenuItemClick = () => {
@@ -28,7 +32,11 @@ export const Navbar = () => {
         setShowProfileModal(!showProfileModal);
         setShowUserMenu(false);
     }
-
+    
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
 
     return (
         <>
@@ -45,7 +53,9 @@ export const Navbar = () => {
                     </button>
 
 
-                    <div className="font-bold text-xl md:ml-0 mx-auto md:mx-0">CineNow</div>
+                    <div className="font-bold text-xl md:ml-0 mx-auto md:mx-0">
+                        <Link to="/">CineNow</Link>
+                    </div>
 
                     {/* Enlaces de navegación (solo desktop) */}
                     <div className="hidden md:flex space-x-6">
@@ -74,26 +84,33 @@ export const Navbar = () => {
                         {showUserMenu && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
 
+                                {
+                                    roles.includes("usuario") || roles.includes("VipUsuario") || roles.includes("Admin") ? (
+                                        <button
+                                            className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+                                            onClick={handleModalUser} >
+                                            Mi Perfil
+                                        </button>
+                                    ) : null
+                                }
+
+
+                                {userMenuUsuario
+                                    .filter((item) => item.roles.includes(roles[0])) 
+                                    .map((item, index) => (
+                                        <Link
+                                            key={index}
+                                            to={item.href}
+                                            className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+                                            onClick={handleMenuItemClick}
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    ))}
+
                                 <button
                                     className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 transition-colors duration-150"
-                                    onClick={handleModalUser} >
-                                    Mi Perfil
-                                </button>
-
-                                {userMenuItems.map((item, index) => (
-                                    <a
-                                        key={index}
-                                        href={item.href}
-                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"
-                                        onClick={handleMenuItemClick}
-                                    >
-                                        {item.label}
-                                    </a>
-                                ))}
-
-                                <button
-                                    className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 transition-colors duration-150"
-                                    onClick={logout} >
+                                    onClick={handleLogout} >
                                     Cerrar Sesión
                                 </button>
 

@@ -19,7 +19,7 @@ export const ActualizarInfoUser = async (token, dataUser  ) => {
             }
         });
         
-        ActualizarInfoUser(dataUser.nombre, dataUser.apellido, dataUser.correo, dataUser.FotoPerfil);  
+        ActualizarInfoUser(dataUser.nombre, dataUser.apellido, dataUser.correo, dataUser.FotoPerfil, dataUser.NumeroCuenta, dataUser.NumeroCuenta );  
         
         return {
             status: true,

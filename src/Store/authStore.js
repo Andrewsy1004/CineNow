@@ -16,7 +16,7 @@ const useAuthStore = create(
         FotoPerfil: null,
         
         
-        Login: ( id, correo, nombre, apellido, roles, token, FotoPerfil ) => set({
+        Login: ( id, correo, nombre, apellido, roles, token, FotoPerfil, NumeroCuenta ) => set({
           id,
           correo,
           nombre,
@@ -24,7 +24,8 @@ const useAuthStore = create(
           roles,
           token,
           Status: true,
-          FotoPerfil
+          FotoPerfil,
+          NumeroCuenta
        }),
 
         Logout: () => set({
@@ -35,14 +36,16 @@ const useAuthStore = create(
           roles: [],
           token: null,
           Status: false,
-          FotoPerfil: null
+          FotoPerfil: null,
+          NumeroCuenta: null
        }),
 
-       ActualizarPerfil : ( nombre, apellido, correo,FotoPerfil ) => set({
+       ActualizarPerfil : ( nombre, apellido, correo,FotoPerfil, NumeroCuenta ) => set({
         nombre,
         apellido,
         correo,
-        FotoPerfil
+        FotoPerfil,
+        NumeroCuenta
       }),
 
         

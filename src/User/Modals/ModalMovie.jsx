@@ -8,7 +8,7 @@ import { Autoplay } from 'swiper/modules';
 
 import "swiper/css";
 
-export const ModalMovie = ({ selectedMovie, genreMap, closeModal }) => {
+export const ModalMovie = ({ selectedMovie, genreMap, closeModal, Upcoming = false }) => {
   const [actores, setActores] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -116,21 +116,25 @@ export const ModalMovie = ({ selectedMovie, genreMap, closeModal }) => {
           )}
         </div>
 
-        <div className="flex justify-end space-x-2">
-          <button
-            onClick={closeModal}
-            className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition duration-300"
-          >
-            Cancelar
-          </button>
+        {/* {
+          !Upcoming && (
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={closeModal}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition duration-300"
+              >
+                Cancelar
+              </button>
 
-          <button
-            className="bg-[#e7000b] text-white px-4 py-2 rounded hover:bg-[#c60009] transition duration-300"
-          >
-            Comprar Boleto
-          </button>
+              <button
+                className="bg-[#e7000b] text-white px-4 py-2 rounded hover:bg-[#c60009] transition duration-300"
+              >
+                Comprar Boleto
+              </button>
+            </div>
+          )
+        } */}
 
-        </div>
       </div>
     </div>
   );

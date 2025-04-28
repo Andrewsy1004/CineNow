@@ -12,7 +12,7 @@ export const Main = () => {
   const getMovies = async () => {
     try {
       setLoading(true);
-      const moviesData = await getPopularMoviesFromTMDB(2);
+      const moviesData = await getPopularMoviesFromTMDB(1);
       setMovies(moviesData);
     } catch (error) {
       console.error("Error al obtener las películas:", error);

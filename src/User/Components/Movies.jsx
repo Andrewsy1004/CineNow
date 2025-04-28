@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 import { Movie } from "../Cards";
@@ -6,6 +5,7 @@ import { Movie } from "../Cards";
 import { getPopularMoviesFromTMDB } from "../../Landing/helpers";
 import { getMoviesUpcoming } from "../../Helpers/Tmdb";
 
+import useAuthStore from "../../Store/authStore";
 
 export const Movies = () => {
   const [movies, setMovies] = useState([]);
@@ -17,26 +17,19 @@ export const Movies = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  const roles = useAuthStore((state) => state.roles);
+
   const getMovies = async (page) => {
     try {
       setLoading(true);
 
       const moviesData = await getPopularMoviesFromTMDB(page);
-      const moviesUpcoming = await getMoviesUpcoming(page+2);
 
       setMovies((prevMovies) => {
-        const existingIds = new Set(prevMovies.map(movie => movie.id));
-        const uniqueNewMovies = moviesData.filter(movie => !existingIds.has(movie.id));
+        const existingIds = new Set(prevMovies.map((movie) => movie.id));
+        const uniqueNewMovies = moviesData.filter((movie) => !existingIds.has(movie.id));
         return [...prevMovies, ...uniqueNewMovies];
       });
-      
-
-      setUpcomingMovies((prevMovies) => {
-        const existingIds = new Set(prevMovies.map(movie => movie.id));
-        const uniqueNewMovies = moviesUpcoming.filter(movie => !existingIds.has(movie.id));
-        return [...prevMovies, ...uniqueNewMovies];
-      });
-
     } catch (error) {
       console.error("Error al obtener las películas:", error);
     } finally {
@@ -44,9 +37,22 @@ export const Movies = () => {
     }
   };
 
+  const getUpcomingMovies = async () => {
+    try {
+      const moviesUpcoming = await getMoviesUpcoming(15); 
+      setUpcomingMovies(moviesUpcoming);
+    } catch (error) {
+      console.error("Error al obtener las películas próximas:", error);
+    }
+  };
+
   useEffect(() => {
     getMovies(page);
   }, [page]);
+
+  useEffect(() => {
+    getUpcomingMovies();
+  }, []); 
 
   const loadMoreMovies = () => {
     setPage((prevPage) => prevPage + 1);
@@ -56,7 +62,7 @@ export const Movies = () => {
     const query = e.target.value;
     setSearchText(query);
 
-    if (query.trim() === '') {
+    if (query.trim() === "") {
       setIsSearching(false);
       setSearchResults([]);
       return;
@@ -64,28 +70,27 @@ export const Movies = () => {
 
     setIsSearching(true);
 
-    if( activeTab === "cartelera"){
-      const results = movies.filter((movie) => movie.title.toLowerCase().includes(query.toLowerCase()));
+    if (activeTab === "cartelera") {
+      const results = movies.filter((movie) =>
+        movie.title.toLowerCase().includes(query.toLowerCase())
+      );
       setSearchResults(results);
-      return;
-    }else{
-      const results = upcomingMovies.filter((movie) => movie.title.toLowerCase().includes(query.toLowerCase()));
+    } else {
+      const results = upcomingMovies.filter((movie) =>
+        movie.title.toLowerCase().includes(query.toLowerCase())
+      );
       setSearchResults(results);
-      return;
     }
-
   };
 
   const displayedMovies = isSearching
-  ? searchResults
-  : activeTab === "cartelera"
-  ? movies
-  : upcomingMovies;
-  
+    ? searchResults
+    : activeTab === "cartelera"
+    ? movies
+    : upcomingMovies;
 
   return (
     <div className="p-4 min-h-screen">
-
       <h1 className="text-3xl font-bold text-[#e7000b] mb-2 text-center mt-7">
         🎬 Películas
       </h1>
@@ -100,10 +105,9 @@ export const Movies = () => {
           className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e7000b] focus:border-transparent"
         />
 
-        {/* Dropdown de resultados estilo Google */}
         {isSearching && searchResults.length > 0 && (
           <div className="absolute z-10 bg-white shadow-lg rounded-lg mt-1 w-full max-w-md mx-auto left-0 right-0">
-            {searchResults.slice(0, 5).map(movie => (
+            {searchResults.slice(0, 5).map((movie) => (
               <div
                 key={movie.id}
                 className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 flex items-center"
@@ -124,36 +128,40 @@ export const Movies = () => {
         )}
       </div>
 
-      {/* Tabs para cambiar entre secciones */}
-      <div className="flex justify-center space-x-2 mb-6">
-        <button
-          onClick={() => setActiveTab("cartelera")}
-          className={`px-6 py-2 rounded ${activeTab === "cartelera"
-            ? "bg-[#e7000b] text-white"
-            : "bg-[#fcd5d8] text-black"
+      {roles.includes("usuario") || roles.includes("VipUsuario") ? (
+        <div className="flex justify-center space-x-2 mb-6">
+          <button
+            onClick={() => setActiveTab("cartelera")}
+            className={`px-6 py-2 rounded ${
+              activeTab === "cartelera"
+                ? "bg-[#e7000b] text-white"
+                : "bg-[#fcd5d8] text-black"
             } transition duration-300`}
-        >
-          Cartelera
-        </button>
-        <button
-          onClick={() => setActiveTab("proximamente")}
-          className={`px-6 py-2 rounded ${activeTab === "proximamente"
-            ? "bg-[#e7000b] text-white"
-            : "bg-[#fcd5d8] text-black"
+          >
+            Cartelera
+          </button>
+          <button
+            onClick={() => setActiveTab("proximamente")}
+            className={`px-6 py-2 rounded ${
+              activeTab === "proximamente"
+                ? "bg-[#e7000b] text-white"
+                : "bg-[#fcd5d8] text-black"
             } transition duration-300`}
-        >
-          Próximamente
-        </button>
-      </div>
+          >
+            Próximamente
+          </button>
+        </div>
+      ) : null}
 
       {activeTab === "cartelera" && (
         <>
-
           <Movie displayedMovies={displayedMovies} />
 
           {isSearching && searchResults.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-600">No se encontraron películas que coincidan con "{searchText}"</p>
+              <p className="text-gray-600">
+                No se encontraron películas que coincidan con "{searchText}"
+              </p>
             </div>
           )}
 
@@ -161,49 +169,39 @@ export const Movies = () => {
             <div className="mt-8 text-center">
               {loading ? (
                 <p className="text-gray-500">Cargando...</p>
-              ) : (
+              ) : page < 5 ? (
                 <button
                   onClick={loadMoreMovies}
                   className="bg-[#e7000b] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#c60009] transition duration-300"
                 >
                   Cargar más
                 </button>
+              ) : (
+                <button
+                  disabled
+                  className="bg-gray-400 text-white px-6 py-3 rounded-lg font-semibold cursor-not-allowed"
+                >
+                  No hay más páginas
+                </button>
               )}
             </div>
           )}
         </>
       )}
-
 
       {activeTab === "proximamente" && (
         <>
-
-          <Movie displayedMovies={displayedMovies} />
+          <Movie displayedMovies={displayedMovies} Upcoming={true} />
 
           {isSearching && searchResults.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-600">No se encontraron películas que coincidan con "{searchText}"</p>
-            </div>
-          )}
-
-          {!isSearching && (
-            <div className="mt-8 text-center">
-              {loading ? (
-                <p className="text-gray-500">Cargando...</p>
-              ) : (
-                <button
-                  onClick={loadMoreMovies}
-                  className="bg-[#e7000b] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#c60009] transition duration-300"
-                >
-                  Cargar más
-                </button>
-              )}
+              <p className="text-gray-600">
+                No se encontraron películas que coincidan con "{searchText}"
+              </p>
             </div>
           )}
         </>
       )}
-
-
     </div>
   );
 };

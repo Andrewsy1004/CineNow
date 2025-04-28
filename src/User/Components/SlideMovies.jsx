@@ -4,6 +4,8 @@ import { Pagination, Navigation, Autoplay } from "swiper/modules";
 import { Loader } from "../../Components/";
 import { genreMap } from "../../Constants";
 
+import toast from "react-hot-toast";
+
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
@@ -15,6 +17,34 @@ export const SlideMovies = ({ movies, loading }) => {
   const posterSize = "w500";
 
   if (loading) return <Loader />;
+
+
+  const handleMovieClick = (movie) => {
+     
+    const objectmovie = {
+      id: movie.id,
+      title: movie.title,
+      poster_path: movie.poster_path,
+      backdrop_path: movie.backdrop_path,
+      overview: movie.overview,
+      vote_count: movie.vote_count,
+      genres: movie.genres,
+      amount_of_tickets: 1,
+    };
+    
+    const stored = JSON.parse(localStorage.getItem("entradas")) || [];
+     
+    const exists = stored.some((t) => t.id === objectmovie.id);
+
+    if (exists) {
+      toast.error("Ya tienes un boleto para esta película.");
+    } else {
+      stored.push(objectmovie);
+      localStorage.setItem("entradas", JSON.stringify(stored));
+      toast.success("Boleto agregado correctamente.");
+    }
+  
+  }
 
   return (
     <div className="relative w-full">
@@ -104,6 +134,8 @@ export const SlideMovies = ({ movies, loading }) => {
 
                     <div>
                       <button
+                        onClick={() => handleMovieClick(movie)}
+                        type="button"
                         className="bg-primary-red hover:bg-red-800 text-white 
                          font-medium py-2 px-6 md:py-3 md:px-8 
                          rounded-full text-sm md:text-base
