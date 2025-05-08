@@ -39,15 +39,14 @@ export const Movie = ({ displayedMovies, Upcoming = false }) => {
 
     const objectmovie = {
       id: movie.id,
-      title: movie.title,
-      poster_path: movie.poster_path,
-      backdrop_path: movie.backdrop_path,
-      overview: movie.overview,
-      vote_count: movie.vote_count,
-      genres: movie.genres,
+      title: movie.title ?? movie.titulo,
+      poster_path: movie.poster_path ?? movie.Poster,
+      backdrop_path: movie.backdrop_path ?? movie.Poster,
+      overview: movie.overview ?? movie.descripcion,
+      vote_count: movie.vote_count ?? movie.promedio,
+      genres: movie.genres ?? movie.generos,
       amount_of_tickets: 1,
     };
-
 
     const stored = JSON.parse(localStorage.getItem("entradas")) || [];
 
@@ -74,9 +73,9 @@ export const Movie = ({ displayedMovies, Upcoming = false }) => {
             className="bg-white text-[#333] p-4 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-2xl"
           >
             <img
-              src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
+              src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path ?? movie.Poster}`}
               onClick={() => openModal(movie)}
-              alt={movie.title}
+              alt={movie.title ?? movie.titulo}
               className="w-full h-48 object-cover rounded mb-4"
               onError={(e) => {
                 e.target.src =
@@ -84,27 +83,35 @@ export const Movie = ({ displayedMovies, Upcoming = false }) => {
               }}
             />
             <h2 className="text-lg font-semibold mb-2 text-[#e7000b]">
-              {movie.title}
+              {movie.title ?? movie.titulo}
             </h2>
             <p className="text-sm text-gray-600 mb-2">
               {movie.overview
                 ? movie.overview.slice(0, 100) + "..."
-                : "Sin descripción disponible."}
+                : movie.descripcion
+                  ? movie.descripcion.slice(0, 100) + "..."
+                  : "Sin descripción disponible."}
             </p>
-            <p className="text-sm text-gray-500 mb-4">
-              <strong>Géneros:</strong>{" "}
-              {movie.genre_ids
-                .map((id) => genreMap[id])
-                .filter(Boolean)
-                .join(", ")}
-            </p>
+
+            <div>
+              <p className="text-sm text-gray-500 mb-4">
+                <strong>Géneros:</strong>{" "}
+                {movie.genre_ids?.length > 0
+                  ? movie.genre_ids
+                    .map((id) => genreMap[id])
+                    .filter(Boolean)
+                    .join(", ") || "Sin géneros disponibles"
+                  : movie.generos?.length > 0
+                    ? movie.generos.slice(0, 3).join(", ")
+                    : "Sin géneros disponibles"}
+              </p>
+            </div>
 
 
             {
               (roles.includes("usuario") || roles.includes("VipUsuario")) && !Upcoming ? (
                 <button
                   onClick={() => {
-                    select(movie);
                     handleMovieClick(movie);
                   }}
                   className="bg-[#e7000b] text-white px-4 py-2 rounded hover:bg-[#c60009] transition duration-300"
@@ -152,7 +159,7 @@ export const Movie = ({ displayedMovies, Upcoming = false }) => {
 
       {modalInfoUser && selectedMovie && (
         <>
-          <ModalFormUser selectedMovie={selectedMovie} onClose={() => setModalInfoUser(false)}  />
+          <ModalFormUser selectedMovie={selectedMovie} onClose={() => setModalInfoUser(false)} />
         </>
       )}
 

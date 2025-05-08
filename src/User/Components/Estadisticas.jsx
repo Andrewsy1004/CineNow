@@ -1,9 +1,14 @@
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { ShoppingCart, ChevronLeft, ChevronRight, FileDown } from "lucide-react";
 
-import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { pdf } from "@react-pdf/renderer";
 import { useReactTable, getCoreRowModel, getPaginationRowModel, flexRender } from "@tanstack/react-table";
 
+import toast from "react-hot-toast"
+import { PdfDocumentEstadisticas } from "../../Pdf";
+
+// Datos de compras
 const datosCompras = [
   { id: 1, nombre: "Dune: Parte 2", cantidad: 3, dia: "15/05/2024", precio: 24.50, sala: "Sala 3D" },
   { id: 2, nombre: "Godzilla vs Kong", cantidad: 2, dia: "20/04/2024", precio: 16.00, sala: "Sala Premium" },
@@ -15,6 +20,14 @@ const datosCompras = [
 const totalDinero = datosCompras.reduce((total, compra) => total + compra.precio, 0).toFixed(2);
 
 export const Estadisticas = () => {
+  const [isClient, setIsClient] = useState(false);
+  const [loadingPdf, setLoadingPdf] = useState(false);
+  const [pdfBlob, setPdfBlob] = useState(null);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const columns = useMemo(
     () => [
       {
@@ -68,14 +81,62 @@ export const Estadisticas = () => {
     },
   });
 
+  // Función para generar y descargar el PDF
+  const generatePdf = async () => {
+    try {
+      setLoadingPdf(true);
+
+      const blob = await pdf(
+        <PdfDocumentEstadisticas data={datosCompras} totalDinero={totalDinero} />
+      ).toBlob();
+      
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = "historial-compras.pdf";
+      document.body.appendChild(link);
+      link.click();
+      
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setLoadingPdf(false);
+
+      toast.success("PDF generado y descargado con éxito!");
+
+    } catch (error) {
+      console.error("Error generando PDF:", error);
+      setLoadingPdf(false);
+      toast.error("Error generando PDF. Intenta nuevamente.");
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-6xl mx-auto  mb-48">
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-6xl mx-auto mb-48">
       {/* Header */}
       <div className="border-b pb-4 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <ShoppingCart className="h-6 w-6 text-primary-red mr-2" />
-            <h2 className="text-xl font-bold text-gray-800">Historial de Compras</h2>
+          <ShoppingCart className="h-6 w-6 text-primary-red mr-2" />
+          <h2 className="text-xl font-bold text-gray-800">Historial de Compras</h2>
+          </div>
+          
+          {/* Botón de descarga PDF */}
+          <div className="flex items-center">
+            <button
+              onClick={generatePdf}
+              disabled={loadingPdf}
+              className="flex items-center px-4 py-2 bg-primary-red text-white rounded-md transition-colors disabled:opacity-50"
+            >
+              {loadingPdf ? (
+                "Generando PDF..."
+              ) : (
+                <>
+                  <FileDown className="h-5 w-5 mr-2" />
+                  Descargar PDF
+                </>
+              )}
+            </button>
           </div>
         </div>
         <p className="text-gray-500 mt-1">Revisa todas tus compras de entradas</p>
@@ -181,21 +242,14 @@ export const Estadisticas = () => {
               </button>
             </nav>
           </div>
-
         </div>
-
       </div>
 
-
       {/* Total de dinero */}
-
       <div className="mt-6 text-lg font-semibold text-gray-800">
         Total de dinero: ${totalDinero}
       </div>
-
-
+      
     </div>
   );
 }
-
-

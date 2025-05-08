@@ -9,13 +9,13 @@ export const IniciarSesion = async (emailUser, contrasena) => {
    const Login = useAuthStore.getState().Login
 
    try {
-      // const response = await axios.post(`${host}/auth/login`, { correo: emailUser, contrasena });
+      const response = await axios.post(`${host}/auth/login`, { correo: emailUser, contrasena });
 
-      // const { id, correo, nombre, apellido, roles, token, FotoPerfil, NumeroCuenta } = response.data;
+      const { id, correo, nombre, apellido, roles, token, FotoPerfil, NumeroCuenta } = response.data;
 
-      // Login(id, correo, nombre, apellido, roles, token, FotoPerfil, NumeroCuenta);
+      Login(id, correo, nombre, apellido, roles, token, FotoPerfil, NumeroCuenta);
 
-      Login("1234", "andres.sy", "andres", "felipe", ["Cajero"], "1234TOKEN", "HTTP:IMG", "123 456 789"  )
+      // Login("1234", "andres.sy", "andres", "felipe", ["usuario"], "1234TOKEN", "HTTP:IMG", "123 456 789"  )
 
       return {
          status: true,

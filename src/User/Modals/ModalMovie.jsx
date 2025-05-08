@@ -34,7 +34,7 @@ export const ModalMovie = ({ selectedMovie, genreMap, closeModal, Upcoming = fal
       <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-xl font-bold text-primary-red">
-            {selectedMovie.title}
+            {selectedMovie.title ?? selectedMovie.titulo}
           </h2>
           <button
             onClick={closeModal}
@@ -45,7 +45,7 @@ export const ModalMovie = ({ selectedMovie, genreMap, closeModal, Upcoming = fal
         </div>
 
         <img
-          src={`https://image.tmdb.org/t/p/w500${selectedMovie.backdrop_path}`}
+          src={`https://image.tmdb.org/t/p/w500${selectedMovie.backdrop_path ?? selectedMovie.Poster}`}
           alt={selectedMovie.title}
           className="w-full h-30 object-cover rounded mb-4"
           onError={(e) => {
@@ -54,16 +54,20 @@ export const ModalMovie = ({ selectedMovie, genreMap, closeModal, Upcoming = fal
         />
 
         <p className="text-sm text-gray-600 mb-2">
-          {selectedMovie.overview || "Sin descripción disponible."}
+          {selectedMovie.overview ?? selectedMovie.descripcion }
         </p>
 
-        <div className="mb-2">
-          <p className="text-sm text-gray-500">
-            <span className="text-primary-red" >Géneros:</span>{" "}
-            {selectedMovie.genre_ids
-              .map((id) => genreMap[id])
-              .filter(Boolean)
-              .join(", ")}
+        <div>
+          <p className="text-sm text-gray-500 mb-2">
+            <strong>Géneros:</strong>{" "}
+            {selectedMovie.genre_ids?.length > 0
+              ? selectedMovie.genre_ids
+                .map((id) => genreMap[id])
+                .filter(Boolean)
+                .join(", ") || "Sin géneros disponibles"
+              : selectedMovie.generos?.length > 0
+                ? selectedMovie.generos.slice(0, 3).join(", ")
+                : "Sin géneros disponibles"}
           </p>
         </div>
 

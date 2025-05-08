@@ -20,20 +20,20 @@ export const SlideMovies = ({ movies, loading }) => {
 
 
   const handleMovieClick = (movie) => {
-     
+
     const objectmovie = {
       id: movie.id,
-      title: movie.title,
-      poster_path: movie.poster_path,
-      backdrop_path: movie.backdrop_path,
-      overview: movie.overview,
-      vote_count: movie.vote_count,
-      genres: movie.genres,
+      title: movie.titulo,
+      poster_path: movie.Poster,
+      backdrop_path: movie.Poster,
+      overview: movie.descripcion,
+      vote_count: movie.promedio,
+      genres: movie.generos,
       amount_of_tickets: 1,
     };
-    
+
     const stored = JSON.parse(localStorage.getItem("entradas")) || [];
-     
+
     const exists = stored.some((t) => t.id === objectmovie.id);
 
     if (exists) {
@@ -43,7 +43,7 @@ export const SlideMovies = ({ movies, loading }) => {
       localStorage.setItem("entradas", JSON.stringify(stored));
       toast.success("Boleto agregado correctamente.");
     }
-  
+
   }
 
   return (
@@ -68,7 +68,7 @@ export const SlideMovies = ({ movies, loading }) => {
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
-                  backgroundImage: `url(${baseImageUrl}${backdropSize}${movie.poster_path})`,
+                  backgroundImage: `url(${baseImageUrl}${backdropSize}${movie.Poster})`,
                   backgroundPosition: "center",
                 }}
               ></div>
@@ -81,7 +81,7 @@ export const SlideMovies = ({ movies, loading }) => {
                 <div className="container mx-auto px-4 md:px-12 flex flex-col md:flex-row items-center md:items-start gap-8">
                   <div className="hidden md:block w-40 md:w-64 flex-shrink-0 rounded-lg overflow-hidden shadow-2xl transform transition-all duration-300 hover:scale-105">
                     <img
-                      src={`${baseImageUrl}${posterSize}${movie.poster_path}`}
+                      src={`${baseImageUrl}${posterSize}${movie.Poster}`}
                       alt={movie.title}
                       className="w-full h-auto"
                     />
@@ -90,12 +90,12 @@ export const SlideMovies = ({ movies, loading }) => {
                   {/* Información */}
                   <div className="flex flex-col text-white max-w-2xl">
                     <h2 className="text-3xl md:text-5xl font-bold mb-2">
-                      {movie.title}
+                      {movie.titulo}
                     </h2>
 
                     <div className="flex items-center gap-4 mb-3">
                       <div className="bg-yellow-400 text-black font-semibold px-2 py-1 rounded text-sm">
-                        {movie.vote_average.toFixed(1)}/10
+                        {parseFloat(movie.promedio).toFixed(1)}/10
                       </div>
 
                       <div className="text-sm flex items-center">
@@ -113,21 +113,21 @@ export const SlideMovies = ({ movies, loading }) => {
                             />
                           </svg>
                         </span>
-                        {movie.release_date}
+                        {movie.fecha_lanzamiento}
                       </div>
                     </div>
 
-                    <p className="text-gray-300 mb-6 line-clamp-3 md:line-clamp-4">
-                      {movie.overview || "Sin descripción disponible."}
+                    <p className="text-gray-300 mb-3 line-clamp-3 md:line-clamp-4">
+                      {movie.descripcion || "Sin descripción disponible."}
                     </p>
 
                     <div className="flex flex-wrap gap-1 md:gap-2 mb-3 md:mb-6 justify-center md:justify-start">
-                      {movie.genre_ids?.slice(0, 3).map((genreId) => (
+                      {movie.generos?.slice(0, 3).map((genre, index) => (
                         <span
-                          key={genreId}
+                          key={index}
                           className="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-3 py-1 rounded-full transition-colors duration-200"
                         >
-                          {genreMap[genreId] || "Otros"}
+                          {genre}
                         </span>
                       ))}
                     </div>
