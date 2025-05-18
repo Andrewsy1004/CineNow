@@ -26,26 +26,14 @@ export const Movies = () => {
     try {
       setLoading(true);
 
-      // const moviesData = await getPopularMoviesFromTMDB(page);
-
-      // setMovies((prevMovies) => {
-      //   const existingIds = new Set(prevMovies.map((movie) => movie.id));
-      //   const uniqueNewMovies = moviesData.filter((movie) => !existingIds.has(movie.id));
-      //   return [...prevMovies, ...uniqueNewMovies];
-      // });
-
       const moviesData = await getMoviesWithPagination(page, token);
-      setMovies((prevMovies) => [...prevMovies, ...moviesData]);
-
-
-      // setMovies((prevMovies) => {
-      //   const existingIds = new Set(prevMovies.map((movie) => movie.id));
-      //   const uniqueNewMovies = moviesData.filter((movie) => !existingIds.has(movie.id));
-      //   return [...prevMovies, ...uniqueNewMovies];
-      // });
-    
-
-
+      
+      setMovies((prevMovies) => {
+        const existingIds = new Set(prevMovies.map((movie) => movie.id));
+        const uniqueNewMovies = moviesData.filter((movie) => !existingIds.has(movie.id));
+        return [...prevMovies, ...uniqueNewMovies];
+      });
+       
     } catch (error) {
       console.error("Error al obtener las películas:", error);
     } finally {
@@ -56,7 +44,14 @@ export const Movies = () => {
   const getUpcomingMovies = async () => {
     try {
       const moviesUpcoming = await getMoviesUpcoming(15); 
-      setUpcomingMovies(moviesUpcoming);
+      
+      // Crear objetos con prefijos en los IDs para evitar colisiones con cartelera
+      const uniqueUpcomingMovies = moviesUpcoming.map(movie => ({
+        ...movie,
+        uniqueId: `upcoming_${movie.id}` // Creamos un ID único para upcoming movies
+      }));
+      
+      setUpcomingMovies(uniqueUpcomingMovies);
     } catch (error) {
       console.error("Error al obtener las películas próximas:", error);
     }
@@ -87,13 +82,10 @@ export const Movies = () => {
     setIsSearching(true);
 
     if (activeTab === "cartelera") {
-
       const results = movies.filter((movie) =>
         movie.titulo.toLowerCase().includes(query.toLowerCase())
       );
-
       setSearchResults(results);
-
     } else {
       const results = upcomingMovies.filter((movie) =>
         movie.title.toLowerCase().includes(query.toLowerCase())
@@ -129,16 +121,16 @@ export const Movies = () => {
           <div className="absolute z-10 bg-white shadow-lg rounded-lg mt-1 w-full max-w-md mx-auto left-0 right-0">
             {searchResults.slice(0, 5).map((movie) => (
               <div
-                key={movie.id}
+                key={movie.uniqueId || movie.id} // Usar uniqueId si existe, sino usar id
                 className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 flex items-center"
                 onClick={() => {
-                  setSearchText(movie.title ?? movie.titulo );
+                  setSearchText(movie.title ?? movie.titulo);
                   setIsSearching(false);
                 }}
               >
                 <img
                   src={`https://image.tmdb.org/t/p/w92${movie.poster_path ?? movie.Poster}`}
-                  alt={movie.title}
+                  alt={movie.title ?? movie.titulo}
                   className="w-8 h-12 object-cover mr-2 rounded"
                 />
                 <span>{movie.title ?? movie.titulo}</span>

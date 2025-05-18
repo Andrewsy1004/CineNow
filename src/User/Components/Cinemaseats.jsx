@@ -3,20 +3,25 @@ import { useState, useEffect } from "react";
 import { X, Check } from "lucide-react";
 import toast from "react-hot-toast";
 
-export const Cinemaseats = ({ entradaSeleccionada, cerrarModal, comprarEntradas }) => {
+import useAuthStore from '../../Store/authStore';
+import { createNewBooking } from "../Helpers";
+
+
+export const Cinemaseats = ({ entradaSeleccionada, cerrarModal, comprarEntradas, asientos }) => {
   const [asientosSeleccionados, setAsientosSeleccionados] = useState([]);
   const [asientosOcupados, setAsientosOcupados] = useState([]);
   
+  const roles = useAuthStore((state) => state.roles);
+  const token = useAuthStore((state) => state.token);
+
+  const precio = roles.includes("VipUsuario") ? 6.9 : 8.9;
+
 
   const filas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
   const columnas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   
-  useEffect(() => {
-    const ocupadosSimulados = [
-      'A1', 'A2', 'B5', 'C7', 'D3', 'D4', 'D5', 'E8', 'F2', 'G10', 'H4', 'I6', 'J9'
-    ];
-    
-    setAsientosOcupados(ocupadosSimulados);
+  useEffect(() => {    
+    setAsientosOcupados(asientos);
   }, []);
   
   // Manejar la selección de asientos
@@ -30,7 +35,7 @@ export const Cinemaseats = ({ entradaSeleccionada, cerrarModal, comprarEntradas 
     // Verificar el límite de selección (no debe exceder la cantidad de entradas)
     if (!asientosSeleccionados.includes(asientoId) && 
         asientosSeleccionados.length >= (entradaSeleccionada.amount_of_tickets || 1)) {
-      toast.error(`Solo puedes seleccionar ${entradaSeleccionada.amount_of_tickets} asiento(s)`);
+        toast.error(`Solo puedes seleccionar ${entradaSeleccionada.amount_of_tickets} asiento(s)`);
       return;
     }
     
@@ -43,26 +48,36 @@ export const Cinemaseats = ({ entradaSeleccionada, cerrarModal, comprarEntradas 
   };
   
   // Confirmar la selección de asientos
-  const confirmarSeleccion = () => {
+  const confirmarSeleccion =  async () => {
     if (asientosSeleccionados.length < (entradaSeleccionada.amount_of_tickets || 1)) {
       toast.error(`Debes seleccionar ${entradaSeleccionada.amount_of_tickets} asiento(s)`);
       return;
     }
-    
-    // Aquí puedes guardar los asientos seleccionados
-    // Por ejemplo, guardarlos en localStorage o enviarlos al backend
-    const nuevosOcupados = [...asientosOcupados, ...asientosSeleccionados];
-    // localStorage.setItem("asientosOcupados", JSON.stringify(nuevosOcupados));
-    
+        
     // Puedes añadir la información de los asientos a la entrada seleccionada
     const entradaConAsientos = {
       ...entradaSeleccionada,
       asientos: asientosSeleccionados
     };
     
-    console.log("Compra completada con asientos:", entradaConAsientos);
-    toast.success(`¡Entradas compradas! Asientos: ${asientosSeleccionados.join(', ')}`);
     
+    const hora_inicio =  entradaConAsientos.horario.split("-")[0].trim();
+    const hora_final  =  entradaConAsientos.horario.split("-")[1].trim();
+
+    const DataCreateSeats = {
+        posicion:     asientosSeleccionados,
+        hora_inicio:  hora_inicio,
+        hora_final:   hora_final,
+        fecha:        entradaConAsientos.fecha,
+        id_pelicula:  entradaConAsientos.id,
+        total:        precio * (entradaConAsientos.amount_of_tickets),
+        metodo_pago:  "Tarjeta",
+    }
+    
+    const response = await createNewBooking(token, DataCreateSeats);
+    
+    toast.success(response.msg);
+
     // Completar el proceso de compra
     comprarEntradas();
   };

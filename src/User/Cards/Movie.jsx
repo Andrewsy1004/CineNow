@@ -69,7 +69,7 @@ export const Movie = ({ displayedMovies, Upcoming = false }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {displayedMovies.map((movie) => (
           <div
-            key={movie.id}
+            key={movie.id }
             className="bg-white text-[#333] p-4 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-2xl"
           >
             <img

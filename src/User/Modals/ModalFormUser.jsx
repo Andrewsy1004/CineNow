@@ -48,7 +48,7 @@ export const ModalFormUser = ({ selectedMovie,onClose }) => {
         {selectedMovie && (
           <div className="mb-4 p-3 bg-gray-100 rounded-lg">
             <p className="font-medium text-[#e7000b]">
-              Película: {selectedMovie.title}
+              Película: {selectedMovie.titulo}
             </p>
           </div>
         )}

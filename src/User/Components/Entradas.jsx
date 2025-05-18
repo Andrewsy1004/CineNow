@@ -6,17 +6,20 @@ import toast from "react-hot-toast";
 import useAuthStore from '../../Store/authStore';
 import { ModalMovieBuy } from "../Modals";
 import { Cinemaseats } from "./Cinemaseats";
+import { getSeats } from "../Helpers";
 
 export const Entradas = () => {
   const [entradas, setEntradas] = useState([]);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [entradaSeleccionada, setEntradaSeleccionada] = useState(null);
   const [modalAsientosAbierto, setModalAsientosAbierto] = useState(false);
+  const [asientos, setAsientosOcupados] = useState([]);
 
   const NumeroCuenta = useAuthStore((state) => state.NumeroCuenta);
   const roles = useAuthStore((state) => state.roles);
+  const token = useAuthStore((state) => state.token);
 
-  const precio = roles.includes("VipUsuario") ? 6.9 : 8.9; 
+  const precio = roles.includes("VipUsuario") ? 6.9 : 8.9;
 
   const horariosDisponibles = [
     { id: 1, label: "10:00 - 12:00", inicio: 10, fin: 12 },
@@ -60,7 +63,7 @@ export const Entradas = () => {
     setModalAsientosAbierto(false);
   };
 
-  const comprarEntradas = () => {
+  const comprarEntradas = async () => {
     const { id, fecha, horario, amount_of_tickets } = entradaSeleccionada;
 
     if (!fecha || !horario) {
@@ -77,42 +80,53 @@ export const Entradas = () => {
       toast.error("Carga tu cuenta para continuar.");
       return;
     }
-   
+
     const fechaSeleccionada = new Date(fecha);
     const diaSemana = fechaSeleccionada.getDay();
-    
+
     const ahora = new Date();
     const horas = ahora.getHours().toString().padStart(2, '0');
     const minutos = ahora.getMinutes().toString().padStart(2, '0');
 
 
-    if( diaSemana == 6 ){
+    if (diaSemana == 6) {
       toast.error("No se pueden comprar entradas para el domingo");
       return;
     }
-    
-    const fechaActual = new Date().toISOString().split('T')[0];
-    
-    if( fecha === fechaActual ){
-        // Validar que la hora selecionada sea mayor a la actual        
-        const InicioHorario = horario.split(" - ")[0].split(":").join("");
-        const FinHorario = horario.split(" - ")[1].split(":").join("");
 
-        if( InicioHorario <= horas ){
-          toast.error("No se pueden comprar entradas para horarios pasados !! ");
-          return;
-        }
+    const fechaActual = new Date().toISOString().split('T')[0];
+
+    if (fecha === fechaActual) {
+      // Validar que la hora selecionada sea mayor a la actual        
+      const InicioHorario = horario.split(" - ")[0].split(":").join("");
+      const FinHorario = horario.split(" - ")[1].split(":").join("");
+
+      if (InicioHorario <= horas) {
+        toast.error("No se pueden comprar entradas para horarios pasados !! ");
+        return;
+      }
     }
 
-    console.log("Entradas compradas:", {
-      id,
-      fecha,
-      horario,
-      amount_of_tickets,
-      NumeroCuenta,
-      precio: ((amount_of_tickets || 1) * precio).toFixed(2)
-    });
+    const hora_inicio = horario.split("-")[0].trim();
+    const hora_final = horario.split("-")[1].trim();
+
+    const dataBooking = {
+      fecha: (fecha),
+      hora_inicio: (hora_inicio),
+      hora_final: (hora_final),
+      peliculaId: (id),
+    };
     
+    
+    // Traer los asientos que ya la pelicula tiene ocupados
+    const response = await getSeats(token, dataBooking);
+
+    if( response.msg == "asientos disponibles" ) {
+      setAsientosOcupados(response.asientos);
+    }else{
+      setAsientosOcupados([]);
+    }
+
     cerrarModal();
     setModalAsientosAbierto(true);
   };
@@ -133,23 +147,29 @@ export const Entradas = () => {
 
   const getFechaMaxima = () => {
     const hoy = new Date();
-    hoy.setDate(hoy.getDate() + 14); 
+    hoy.setDate(hoy.getDate() + 14);
     return hoy.toISOString().split('T')[0];
   };
 
   const formatearFecha = (fechaISO) => {
     if (!fechaISO) return "";
-    
+
     const fecha = new Date(fechaISO);
-    const opciones = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const opciones = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     };
-    
+
     return fecha.toLocaleDateString('es-ES', opciones);
   };
+
+  const finalizarCompra =  async() => {
+    toast.success("Compra realizada con éxito");
+    setModalAsientosAbierto(false);
+    setEntradaSeleccionada(null);
+  }
 
   return (
     <div className="p-6 max-w-6xl mx-auto min-h-screen">
@@ -265,15 +285,15 @@ export const Entradas = () => {
                 </div>
 
                 {/* Precio total */}
-                {/* <div className="bg-gray-50 p-3 rounded-lg text-center">
+                <div className="bg-gray-50 p-1 rounded-lg text-center">
                   <p className="text-gray-500 text-sm">Precio total</p>
                   <p className="text-2xl font-bold text-red-600">
-                    €{((entrada.amount_of_tickets || 1) * precio).toFixed(2)}
+                    {((entrada.amount_of_tickets || 1) * precio).toFixed(2)} COD
                   </p>
                   <p className="text-xs text-gray-400">
                     {roles.includes("VipUsuario") ? "Precio con descuento VIP" : "Precio estándar"}
                   </p>
-                </div> */}
+                </div>
 
                 {/* Botón de compra */}
                 <button
@@ -291,10 +311,10 @@ export const Entradas = () => {
 
       {/* Modal de compra */}
       {modalAbierto && entradaSeleccionada && (
-        <ModalMovieBuy 
-          entradaSeleccionada={entradaSeleccionada} 
-          cerrarModal={cerrarModal} 
-          comprarEntradas={comprarEntradas} 
+        <ModalMovieBuy
+          entradaSeleccionada={entradaSeleccionada}
+          cerrarModal={cerrarModal}
+          comprarEntradas={comprarEntradas}
         />
       )}
 
@@ -303,7 +323,8 @@ export const Entradas = () => {
         <Cinemaseats
           entradaSeleccionada={entradaSeleccionada}
           cerrarModal={cerrarModalAsientos}
-          comprarEntradas={comprarEntradas}
+          comprarEntradas={finalizarCompra}
+          asientos={asientos}
         />
       )}
     </div>
