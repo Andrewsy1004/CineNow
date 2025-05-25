@@ -2,13 +2,17 @@
 import { useState } from "react";
 
 import { X } from "lucide-react";
+import toast from "react-hot-toast";
+import { RegistrarUsuario, RegistrarUsuarioPorCajero } from "../../Auth/helpers/User";
 
-export const ModalFormUser = ({ selectedMovie,onClose }) => {
+export const ModalFormUser = ({ selectedMovie,onClose, setModalPelicula, setInfoUser }) => {
   
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
-    correo: ""
+    correo: "",
+    MetodoPago: "",
+    NumeroCuenta: ""
   });
 
   const handleChange = (e) => {
@@ -19,13 +23,47 @@ export const ModalFormUser = ({ selectedMovie,onClose }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit =  async (e) => {
     e.preventDefault();
     
-   
+    // Aquí puedes manejar el envío del formulario
+    const { nombre, apellido, correo, MetodoPago, NumeroCuenta } = formData; 
+    
+    // Validación simple
+    if (!formData.nombre || !formData.apellido || !formData.correo || !formData.MetodoPago) {
+      toast.error("Por favor, completa todos los campos obligatorios.");
+      return;
+    }
 
+    if (formData.MetodoPago == "Tarjeta de Crédito" && !formData.NumeroCuenta) {
+      toast.error("Por favor, ingresa el número de tarjeta.");
+      return;
+    }
 
-    setFormData({ nombre: "", apellido: "", correo: "" });
+    // console.log("Datos del formulario:", formData);
+
+    let response;
+    if (MetodoPago === "Tarjeta de Crédito") {
+      response = await RegistrarUsuarioPorCajero(nombre, apellido, correo, NumeroCuenta);
+    } else {
+      response = await RegistrarUsuarioPorCajero(nombre, apellido, correo, "");
+    }
+
+    if (response.status) {
+      toast.success(response.message);
+      setInfoUser(response.data);
+    }
+    
+    setModalPelicula(true);
+
+    setFormData({
+      nombre: "",
+      apellido: "",
+      correo: "",
+      MetodoPago: "",
+      NumeroCuenta: ""
+    });
+
     onClose();
   };
 
@@ -95,6 +133,41 @@ export const ModalFormUser = ({ selectedMovie,onClose }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7000b]"
             />
           </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="MetodoPago">
+              Método de Pago
+            </label>
+            <select
+              id="MetodoPago"
+              name="MetodoPago"
+              value={formData.MetodoPago}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7000b]"
+            >
+              <option value="">Seleccionar</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+            </select>
+          </div>
+
+          {  formData.MetodoPago === "Tarjeta de Crédito" && (
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-medium mb-2" htmlFor="NumeroCuenta">
+                Número de Tarjeta
+              </label>
+              <input
+                type="text"
+                id="NumeroCuenta"
+                name="NumeroCuenta"
+                value={formData.NumeroCuenta}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#e7000b]"
+              />
+            </div>
+          )
+           
+          }
           
           <div className="flex justify-end gap-3">
             <button

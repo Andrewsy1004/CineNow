@@ -67,7 +67,7 @@ export const PdfDocumentEstadisticas = ({ data, totalDinero }) => {
       <Page size="A4" style={styles.page}>
         <Text style={styles.title}>Historial de Compras</Text>
         <Text style={styles.subtitle}>Resumen de tus compras de entradas</Text>
-        
+
         <View style={styles.table}>
           <View style={[styles.tableRow, styles.tableHeaderRow]}>
             <View style={styles.tableCol}>
@@ -89,31 +89,32 @@ export const PdfDocumentEstadisticas = ({ data, totalDinero }) => {
               <Text style={styles.tableHeader}>Sala</Text>
             </View>
           </View>
-          
+
           {data.map((compra) => (
-            <View key={compra.id} style={styles.tableRow}>
+            <View key={compra.ID} style={styles.tableRow}>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{compra.id}</Text>
+                <Text style={styles.tableCell}>{compra.ID.slice(0, 5)}</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{compra.nombre}</Text>
+                <Text style={styles.tableCell}>{compra.Película}</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{compra.cantidad}</Text>
+                <Text style={styles.tableCell}>{compra.Entradas}</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{compra.dia}</Text>
+                <Text style={styles.tableCell}>{compra.Fecha}</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>${compra.precio.toFixed(2)}</Text>
+                <Text style={styles.tableCell}>${compra.Total}</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{compra.sala}</Text>
+                <Text style={styles.tableCell}>{compra.Sala}</Text>
               </View>
             </View>
           ))}
+
         </View>
-        
+
         <Text style={styles.total}>Total de dinero: ${totalDinero}</Text>
       </Page>
     </Document>

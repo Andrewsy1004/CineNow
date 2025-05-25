@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 
 import { Calendar, Clock, Film, Users, MapPin, QrCode, Ticket, ChevronLeft, ChevronRight } from "lucide-react";
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import useAuthStore from '../../Store/authStore';
 import { GetUserTickets } from "../Helpers/Movies";
@@ -11,11 +12,17 @@ export const Tickets = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const ticketsPerPage = 2;
 
-  const token = useAuthStore((state) => state.token);
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  
+  const tokenFromStore = useAuthStore((state) => state.token);
 
+  const token = (state?.cajero) ? (state?.tokenUser) : tokenFromStore;
+  
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
+  // console.log(token);
 
   // Calcular tickets para la página actual
   const indexOfLastTicket = currentPage * ticketsPerPage;

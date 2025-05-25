@@ -39,7 +39,7 @@ export const MoviePage = () => {
         <aside className=" font-bold text-3xl sm:text-5xl w-full flex sm:flex-row flex-col justify-between">
           <span>
             <h1>{movie.title}</h1>
-            <div className="sm:flex gap-5 max-w-[85%] flex-wrap hidden">
+            {/* <div className="sm:flex gap-5 max-w-[85%] flex-wrap hidden">
               {movie.genre_ids.map((id) => (
                 <span
                   key={id}
@@ -48,7 +48,7 @@ export const MoviePage = () => {
                   {genreMap[id]}
                 </span>
               ))}
-            </div>
+            </div> */}
           </span>
           <p className="sm:mt-0 mt-5 sm:text-3xl text-lg font-normal">{movie.vote_average} ⭐</p>
         </aside>

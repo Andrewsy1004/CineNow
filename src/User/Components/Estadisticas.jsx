@@ -109,7 +109,7 @@ export const Estadisticas = () => {
   const generatePdf = async () => {
     try {
       setLoadingPdf(true);
-
+      
       const blob = await pdf(
         <PdfDocumentEstadisticas data={datosCompras} totalDinero={totalDinero} />
       ).toBlob();

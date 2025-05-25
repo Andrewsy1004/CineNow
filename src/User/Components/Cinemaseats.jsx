@@ -7,18 +7,22 @@ import useAuthStore from '../../Store/authStore';
 import { createNewBooking } from "../Helpers";
 
 
-export const Cinemaseats = ({ entradaSeleccionada, cerrarModal, comprarEntradas, asientos }) => {
+export const Cinemaseats = ({ entradaSeleccionada, cerrarModal, comprarEntradas, asientos, cajero=false , infoUser }) => {
   const [asientosSeleccionados, setAsientosSeleccionados] = useState([]);
   const [asientosOcupados, setAsientosOcupados] = useState([]);
   
-  const roles = useAuthStore((state) => state.roles);
-  const token = useAuthStore((state) => state.token);
+  const roles = cajero ? infoUser?.roles ?? [] : useAuthStore((state) => state.roles);
+  const token = cajero ? infoUser?.token ?? '' : useAuthStore((state) => state.token);
+
+  // console.log("token", token);
 
   const precio = roles.includes("VipUsuario") ? 6.9 : 8.9;
 
 
   const filas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
   const columnas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  
+  // console.log(entradaSeleccionada);
   
   useEffect(() => {    
     setAsientosOcupados(asientos);
@@ -188,7 +192,7 @@ export const Cinemaseats = ({ entradaSeleccionada, cerrarModal, comprarEntradas,
               disabled={asientosSeleccionados.length !== (entradaSeleccionada?.amount_of_tickets || 1)}
               className={`
                 flex-1 py-3 rounded-lg font-medium transition-colors flex items-center justify-center
-                ${asientosSeleccionados.length === (entradaSeleccionada?.amount_of_tickets || 1)
+                ${asientosSeleccionados.length == (entradaSeleccionada?.amount_of_tickets || 1)
                   ? 'bg-[#e7000b] text-white hover:bg-red-700' 
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
               `}

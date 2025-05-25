@@ -15,7 +15,7 @@ export const IniciarSesion = async (emailUser, contrasena) => {
 
       Login(id, correo, nombre, apellido, roles, token, FotoPerfil, NumeroCuenta);
 
-      // Login("1234", "andres.sy", "andres", "felipe", ["usuario"], "1234TOKEN", "HTTP:IMG", "123 456 789"  )
+      // Login("1234", "andres.sy", "andres", "felipe", ["Administrador"], "1234TOKEN", "HTTP:IMG", "123 456 789"  )
 
       return {
          status: true,
@@ -46,6 +46,38 @@ export const RegistrarUsuario = async (nombreUser, apellidoUser, emailUser, cont
          status: true,
          message: "Usuario registrado exitosamente"
       }
+
+   } catch (error) {
+
+      if ( error.response?.status === 400 && error.response?.data?.message.includes('Key (correo)=') ) {
+         return {
+            status: false,
+            message: "Este correo electrónico ya está registrado. Por favor, utiliza otro correo electrónico.",
+         };
+      }
+
+      return {
+         status: false,
+         message: error.response?.data?.message || "Error al registrar el usuario",
+      };
+
+   }
+}
+
+
+export const RegistrarUsuarioPorCajero = async (nombreUser, apellidoUser, emailUser, NumeroCuenta) => {
+
+   try {
+      
+      const response = await axios.post(`${host}/auth/registerUser`, { nombre: nombreUser, apellido: apellidoUser, correo: emailUser, contrasena: emailUser , NumeroCuenta });
+
+      return {
+         status: true,
+         message: "Usuario registrado exitosamente",
+         data: response.data
+      }
+
+      
 
    } catch (error) {
 

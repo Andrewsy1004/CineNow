@@ -58,9 +58,9 @@ export const ModalMovieBuy = ( { entradaSeleccionada, cerrarModal, comprarEntrad
             </div>
 
             <div className="flex justify-between items-center py-2 border-b">
-              <span className="text-gray-600">Día: </span>
+              <span className="text-gray-600">fecha: </span>
               <span className="font-medium">
-                {entradaSeleccionada.dia || "No seleccionado"}
+                {entradaSeleccionada.fecha || "No seleccionado"}
               </span>
             </div>
 

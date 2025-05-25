@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { Trash2, ShoppingCart, Calendar } from "lucide-react";
 
+import { useState, useEffect } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { Trash2, ShoppingCart, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 
 import useAuthStore from '../../Store/authStore';
@@ -8,12 +9,14 @@ import { ModalMovieBuy } from "../Modals";
 import { Cinemaseats } from "./Cinemaseats";
 import { getSeats } from "../Helpers";
 
+
 export const Entradas = () => {
   const [entradas, setEntradas] = useState([]);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [entradaSeleccionada, setEntradaSeleccionada] = useState(null);
   const [modalAsientosAbierto, setModalAsientosAbierto] = useState(false);
   const [asientos, setAsientosOcupados] = useState([]);
+
 
   const NumeroCuenta = useAuthStore((state) => state.NumeroCuenta);
   const roles = useAuthStore((state) => state.roles);
@@ -169,6 +172,7 @@ export const Entradas = () => {
     toast.success("Compra realizada con éxito");
     setModalAsientosAbierto(false);
     setEntradaSeleccionada(null);
+    
   }
 
   return (

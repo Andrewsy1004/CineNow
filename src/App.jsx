@@ -4,6 +4,7 @@ import useAuthStore from './Store/authStore';
 import { LandingRoute } from "./Landing"
 import { UserRoute } from './User/Router';
 import { CashierRoute } from './Cashier';
+import { DashboardRouter } from './Dashboard/Router';
 
 export const App = () => {
   const isAuthenticated = useAuthStore((state) => state.Status);
@@ -13,8 +14,8 @@ export const App = () => {
   const renderRouteByRole = () => {
     if ( roles.includes("usuario") || roles.includes("VipUsuario") ) {
       return <UserRoute />;
-    } else if (roles.includes("Admin")) {
-      return <h1>Admin</h1>;
+    } else if (roles.includes("Administrador")) {
+      return <DashboardRouter />;
     } else if (roles.includes("Cajero")) {
       return <CashierRoute />;
     } else {

@@ -19,3 +19,19 @@ export const genreMap = {
     10752: "Guerra",
     37: "Western",
 };
+
+
+export const monthMap = {
+    'January': 'Ene',
+    'February': 'Feb',
+    'March': 'Mar',
+    'April': 'Abr',
+    'May': 'May',
+    'June': 'Jun',
+    'July': 'Jul',
+    'August': 'Ago',
+    'September': 'Sep',
+    'October': 'Oct',
+    'November': 'Nov',
+    'December': 'Dic'
+};
